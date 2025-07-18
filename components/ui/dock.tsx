@@ -1,7 +1,7 @@
 // components\ui\dock.tsx
 "use client";
 
-import React, { PropsWithChildren, useRef, ReactElement } from "react";
+import React, { useRef, ReactElement } from "react";
 import { cva, type VariantProps } from "class-variance-authority";
 import { motion, MotionValue, useSpring, useTransform, useMotionValue } from "framer-motion";
 
@@ -36,9 +36,10 @@ const Dock = React.forwardRef<HTMLDivElement, DockProps>(
     },
     ref,
   ) => {
-    // Create a local mouseX if not provided
+    // Always create a local mouseX
     const localMouseX = useMotionValue(Infinity);
-    const mouseX = propMouseX || localMouseX;
+    // Use the prop if provided, otherwise use the local one
+    const mouseX = propMouseX ?? localMouseX;
 
     const renderChildren = () => {
       return React.Children.map(children, (child) => {
@@ -76,7 +77,7 @@ Dock.displayName = "Dock";
 export interface DockIconProps {
   magnification?: number;
   distance?: number;
-  mouseX?: MotionValue;
+  mouseX: MotionValue; // Now required
   className?: string;
   children?: React.ReactNode;
 }
@@ -86,7 +87,7 @@ const DockIcon = React.forwardRef<HTMLDivElement, DockIconProps>(
     {
       magnification = DEFAULT_MAGNIFICATION,
       distance = DEFAULT_DISTANCE,
-      mouseX = useMotionValue(Infinity), // Provide default value
+      mouseX,
       className,
       children,
       ...props
