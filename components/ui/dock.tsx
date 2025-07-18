@@ -1,9 +1,9 @@
-//components\ui\dock.tsx
+// components\ui\dock.tsx
 "use client";
 
 import React, { PropsWithChildren, useRef } from "react";
 import { cva, type VariantProps } from "class-variance-authority";
-import {motion, MotionValue, useSpring, useTransform} from "framer-motion";
+import { motion, MotionValue, useSpring, useTransform } from "framer-motion";
 
 import { cn } from "@/lib/utils";
 
@@ -18,7 +18,6 @@ export interface DockProps extends VariantProps<typeof dockVariants> {
 
 const DEFAULT_MAGNIFICATION = 60;
 const DEFAULT_DISTANCE = 140;
-
 
 const dockVariants = cva(
   "supports-backdrop-blur:bg-white/10 supports-backdrop-blur:dark:bg-black/10 mx-auto mt-8 flex h-[58px] w-max gap-2 rounded-2xl border p-2 backdrop-blur-md",
@@ -72,17 +71,14 @@ const Dock = React.forwardRef<HTMLDivElement, DockProps>(
 Dock.displayName = "Dock";
 
 export interface DockIconProps {
-  size?: number;
   magnification?: number;
   distance?: number;
   mouseX?: MotionValue;
   className?: string;
   children?: React.ReactNode;
-  props?: PropsWithChildren;
 }
 
 const DockIcon = ({
-  size,
   magnification = DEFAULT_MAGNIFICATION,
   distance = DEFAULT_DISTANCE,
   mouseX,
@@ -94,18 +90,16 @@ const DockIcon = ({
   const distanceCalc = useTransform(mouseX, (val: number) => {
     if (!ref.current || val == Infinity) return 0;
     const rect = ref.current.getBoundingClientRect();
-    
-
     return val - rect.x - rect.width / 2;
   });
 
-  let widthSync = useTransform(
+  const widthSync = useTransform(
     distanceCalc,
     [-distance, 0, distance],
     [40, magnification, 40],
   );
 
-  let width = useSpring(widthSync, {
+  const width = useSpring(widthSync, {
     mass: 0.1,
     stiffness: 150,
     damping: 12,
