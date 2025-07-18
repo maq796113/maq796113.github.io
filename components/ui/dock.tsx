@@ -1,7 +1,7 @@
 // components\ui\dock.tsx
 "use client";
 
-import React, { useRef, ReactElement } from "react";
+import React, { useRef, ReactElement, forwardRef } from "react";
 import { cva, type VariantProps } from "class-variance-authority";
 import { motion, MotionValue, useSpring, useTransform, useMotionValue } from "framer-motion";
 
@@ -23,7 +23,7 @@ const dockVariants = cva(
   "supports-backdrop-blur:bg-white/10 supports-backdrop-blur:dark:bg-black/10 mx-auto mt-8 flex h-[58px] w-max gap-2 rounded-2xl border p-2 backdrop-blur-md",
 );
 
-const Dock = React.forwardRef<HTMLDivElement, DockProps>(
+const Dock = forwardRef<HTMLDivElement, DockProps>(
   (
     {
       className,
@@ -34,11 +34,9 @@ const Dock = React.forwardRef<HTMLDivElement, DockProps>(
       direction = "bottom",
       ...props
     },
-    ref,
+    ref
   ) => {
-    // Always create a local mouseX
     const localMouseX = useMotionValue(Infinity);
-    // Use the prop if provided, otherwise use the local one
     const mouseX = propMouseX ?? localMouseX;
 
     const renderChildren = () => {
@@ -69,7 +67,7 @@ const Dock = React.forwardRef<HTMLDivElement, DockProps>(
         {renderChildren()}
       </motion.div>
     );
-  },
+  }
 );
 
 Dock.displayName = "Dock";
@@ -77,12 +75,12 @@ Dock.displayName = "Dock";
 export interface DockIconProps {
   magnification?: number;
   distance?: number;
-  mouseX: MotionValue; // Now required
+  mouseX: MotionValue;
   className?: string;
   children?: React.ReactNode;
 }
 
-const DockIcon = React.forwardRef<HTMLDivElement, DockIconProps>(
+const DockIcon = forwardRef<HTMLDivElement, DockIconProps>(
   (
     {
       magnification = DEFAULT_MAGNIFICATION,
@@ -95,7 +93,15 @@ const DockIcon = React.forwardRef<HTMLDivElement, DockIconProps>(
     ref
   ) => {
     const internalRef = useRef<HTMLDivElement>(null);
-    
+    const mergedRef = (node: HTMLDivElement) => {
+      if (typeof ref === "function") {
+        ref(node);
+      } else if (ref) {
+        ref.current = node;
+      }
+      internalRef.current = node;
+    };
+
     const distanceCalc = useTransform(mouseX, (val: number) => {
       if (!internalRef.current || val === Infinity) return 0;
       const rect = internalRef.current.getBoundingClientRect();
@@ -116,7 +122,7 @@ const DockIcon = React.forwardRef<HTMLDivElement, DockIconProps>(
 
     return (
       <motion.div
-        ref={internalRef}
+        ref={mergedRef}
         style={{ width }}
         className={cn(
           "flex aspect-square cursor-pointer items-center justify-center rounded-full",
