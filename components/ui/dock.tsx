@@ -3,7 +3,7 @@
 
 import React, { PropsWithChildren, useRef, ReactElement } from "react";
 import { cva, type VariantProps } from "class-variance-authority";
-import { motion, MotionValue, useSpring, useTransform } from "framer-motion";
+import { motion, MotionValue, useSpring, useTransform, useMotionValue } from "framer-motion";
 
 import { cn } from "@/lib/utils";
 
@@ -30,19 +30,23 @@ const Dock = React.forwardRef<HTMLDivElement, DockProps>(
       children,
       magnification = DEFAULT_MAGNIFICATION,
       distance = DEFAULT_DISTANCE,
-      mouseX,
+      mouseX: propMouseX,
       direction = "bottom",
       ...props
     },
     ref,
   ) => {
+    // Create a local mouseX if not provided
+    const localMouseX = useMotionValue(Infinity);
+    const mouseX = propMouseX || localMouseX;
+
     const renderChildren = () => {
       return React.Children.map(children, (child) => {
         if (React.isValidElement(child) && child.type === DockIcon) {
           return React.cloneElement(child as ReactElement<DockIconProps>, {
-            mouseX: mouseX,
-            magnification: magnification,
-            distance: distance,
+            mouseX,
+            magnification,
+            distance,
           });
         }
         return child;
@@ -52,8 +56,8 @@ const Dock = React.forwardRef<HTMLDivElement, DockProps>(
     return (
       <motion.div
         ref={ref}
-        onMouseMove={(e) => mouseX?.set(e.pageX)}
-        onMouseLeave={() => mouseX?.set(Infinity)}
+        onMouseMove={(e) => mouseX.set(e.pageX)}
+        onMouseLeave={() => mouseX.set(Infinity)}
         {...props}
         className={cn(dockVariants({ className }), {
           "items-start": direction === "top",
@@ -82,7 +86,7 @@ const DockIcon = React.forwardRef<HTMLDivElement, DockIconProps>(
     {
       magnification = DEFAULT_MAGNIFICATION,
       distance = DEFAULT_DISTANCE,
-      mouseX,
+      mouseX = useMotionValue(Infinity), // Provide default value
       className,
       children,
       ...props
@@ -90,8 +94,9 @@ const DockIcon = React.forwardRef<HTMLDivElement, DockIconProps>(
     ref
   ) => {
     const internalRef = useRef<HTMLDivElement>(null);
+    
     const distanceCalc = useTransform(mouseX, (val: number) => {
-      if (!internalRef.current || val == Infinity) return 0;
+      if (!internalRef.current || val === Infinity) return 0;
       const rect = internalRef.current.getBoundingClientRect();
       return val - rect.x - rect.width / 2;
     });
