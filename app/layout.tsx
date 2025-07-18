@@ -35,10 +35,11 @@ export default function RootLayout({
               try {
                 const theme = localStorage.getItem('theme');
                 const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-                document.documentElement.setAttribute(
-                  'data-theme',
-                  theme || (systemDark ? 'dark' : 'light')
-                );
+                if ((theme === 'dark') || (!theme && systemDark)) {
+                  document.documentElement.classList.add('dark');
+                } else {
+                  document.documentElement.classList.remove('dark');
+                }
               } catch (e) {}
             `,
           }}

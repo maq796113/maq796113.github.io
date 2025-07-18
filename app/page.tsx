@@ -10,7 +10,9 @@ import { Separator } from "@/components/ui/separator";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Dock, DockIcon } from "@/components/ui/dock";
 import { ModeToggle } from "@/components/mode-toggle";
+import { AnimatedGridPattern } from "@/components/magicui/animated-grid-pattern";
 import React from "react";
+
 
 type IconProps = React.ComponentProps<typeof Home>; // Get props type from any Lucide icon
 
@@ -79,7 +81,17 @@ export default function HomePage() {
 
   return (
     <div className="relative flex min-h-screen w-full flex-col items-center justify-center overflow-hidden rounded-lg border bg-background md:shadow-xl">
-      <span className="pointer-events-none whitespace-pre-wrap bg-gradient-to-b from-black to-gray-300/80 bg-clip-text text-center text-8xl font-semibold leading-none text-transparent dark:from-white dark:to-slate-900/10">
+      <AnimatedGridPattern
+        numSquares={30}
+        maxOpacity={0.1}
+        duration={3}
+        repeatDelay={1}
+        className={cn(
+          "[mask-image:radial-gradient(500px_circle_at_center,white,transparent)]",
+          "inset-x-0 inset-y-[-30%] h-[200%] skew-y-12",
+        )}
+      />
+      <span className="pointer-events-none whitespace-pre-wrap bg-gradient-to-b from-gray-900 to-gray-400 dark:from-white dark:to-slate-900/10 bg-clip-text text-center text-8xl font-semibold leading-none text-transparent">
         Abdullah Qureshi
       </span>
       

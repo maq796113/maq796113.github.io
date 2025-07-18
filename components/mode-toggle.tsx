@@ -22,26 +22,35 @@ export function ModeToggle({ className }: ModeToggleProps) {
     const systemDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
     const initialTheme = storedTheme || (systemDark ? "dark" : "light");
     setTheme(initialTheme);
-    document.documentElement.setAttribute("data-theme", initialTheme);
+    if (initialTheme === "dark") {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
   }, []);
 
   const toggleTheme = () => {
     const newTheme = theme === "dark" ? "light" : "dark";
     setTheme(newTheme);
     localStorage.setItem("theme", newTheme);
-    document.documentElement.setAttribute("data-theme", newTheme);
+    if (newTheme === "dark") {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
   };
 
-  if (!isMounted) return (
-    <Button 
-      variant="ghost" 
-      size="icon" 
-      className={cn("rounded-full", className)}
-      aria-label="Theme toggle"
-    >
-      <div className="h-4 w-4" />
-    </Button>
-  );
+  if (!isMounted)
+    return (
+      <Button
+        variant="ghost"
+        size="icon"
+        className={cn("rounded-full", className)}
+        aria-label="Theme toggle"
+      >
+        <div className="h-4 w-4" />
+      </Button>
+    );
 
   return (
     <Button
