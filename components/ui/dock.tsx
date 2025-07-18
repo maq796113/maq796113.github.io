@@ -1,7 +1,7 @@
 // components\ui\dock.tsx
 "use client";
 
-import React, { PropsWithChildren, useRef } from "react";
+import React, { PropsWithChildren, useRef, ReactElement } from "react";
 import { cva, type VariantProps } from "class-variance-authority";
 import { motion, MotionValue, useSpring, useTransform } from "framer-motion";
 
@@ -39,8 +39,7 @@ const Dock = React.forwardRef<HTMLDivElement, DockProps>(
     const renderChildren = () => {
       return React.Children.map(children, (child) => {
         if (React.isValidElement(child) && child.type === DockIcon) {
-          return React.cloneElement(child, {
-            ...child.props,
+          return React.cloneElement(child as ReactElement<DockIconProps>, {
             mouseX: mouseX,
             magnification: magnification,
             distance: distance,
@@ -78,47 +77,52 @@ export interface DockIconProps {
   children?: React.ReactNode;
 }
 
-const DockIcon = ({
-  magnification = DEFAULT_MAGNIFICATION,
-  distance = DEFAULT_DISTANCE,
-  mouseX,
-  className,
-  children,
-  ...props
-}: DockIconProps) => {
-  const ref = useRef<HTMLDivElement>(null);
-  const distanceCalc = useTransform(mouseX, (val: number) => {
-    if (!ref.current || val == Infinity) return 0;
-    const rect = ref.current.getBoundingClientRect();
-    return val - rect.x - rect.width / 2;
-  });
+const DockIcon = React.forwardRef<HTMLDivElement, DockIconProps>(
+  (
+    {
+      magnification = DEFAULT_MAGNIFICATION,
+      distance = DEFAULT_DISTANCE,
+      mouseX,
+      className,
+      children,
+      ...props
+    },
+    ref
+  ) => {
+    const internalRef = useRef<HTMLDivElement>(null);
+    const distanceCalc = useTransform(mouseX, (val: number) => {
+      if (!internalRef.current || val == Infinity) return 0;
+      const rect = internalRef.current.getBoundingClientRect();
+      return val - rect.x - rect.width / 2;
+    });
 
-  const widthSync = useTransform(
-    distanceCalc,
-    [-distance, 0, distance],
-    [40, magnification, 40],
-  );
+    const widthSync = useTransform(
+      distanceCalc,
+      [-distance, 0, distance],
+      [40, magnification, 40],
+    );
 
-  const width = useSpring(widthSync, {
-    mass: 0.1,
-    stiffness: 150,
-    damping: 12,
-  });
+    const width = useSpring(widthSync, {
+      mass: 0.1,
+      stiffness: 150,
+      damping: 12,
+    });
 
-  return (
-    <motion.div
-      ref={ref}
-      style={{ width }}
-      className={cn(
-        "flex aspect-square cursor-pointer items-center justify-center rounded-full",
-        className,
-      )}
-      {...props}
-    >
-      {children}
-    </motion.div>
-  );
-};
+    return (
+      <motion.div
+        ref={internalRef}
+        style={{ width }}
+        className={cn(
+          "flex aspect-square cursor-pointer items-center justify-center rounded-full",
+          className,
+        )}
+        {...props}
+      >
+        {children}
+      </motion.div>
+    );
+  }
+);
 
 DockIcon.displayName = "DockIcon";
 
