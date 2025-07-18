@@ -2,7 +2,7 @@
 "use client";
 
 import React from "react";
-import { motion, MotionProps } from "framer-motion";
+import { motion, MotionProps, PanInfo } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 const animationProps: MotionProps = {
@@ -26,9 +26,10 @@ const animationProps: MotionProps = {
   },
 };
 
-interface ShinyButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+interface ShinyButtonProps extends Omit<React.ComponentPropsWithoutRef<"button">, "onDrag"> {
   children: React.ReactNode;
   className?: string;
+  onDrag?: (event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => void;
 }
 
 const ShinyButton = ({ 
