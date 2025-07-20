@@ -2,7 +2,7 @@
 "use client";
 
 import React from "react";
-import { motion, MotionProps } from "framer-motion";
+import { motion, MotionProps, HTMLMotionProps } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 const animationProps: MotionProps = {
@@ -26,7 +26,13 @@ const animationProps: MotionProps = {
   },
 };
 
-interface ShinyButtonProps extends React.ComponentPropsWithoutRef<"button"> {
+// Create a custom type that excludes conflicting drag props
+type ButtonPropsWithoutDrag = Omit<
+  React.ComponentPropsWithoutRef<"button">,
+  keyof HTMLMotionProps<"button"> | "onDrag" | "onDragStart" | "onDragEnd"
+>;
+
+interface ShinyButtonProps extends ButtonPropsWithoutDrag {
   children: React.ReactNode;
   className?: string;
 }
@@ -39,7 +45,7 @@ const ShinyButton = ({
   return (
     <motion.button
       {...animationProps}
-      {...(buttonProps as React.ComponentProps<"button">)}
+      {...buttonProps}
       className={cn(
         "relative rounded-lg px-6 py-2 font-medium backdrop-blur-xl transition-shadow duration-300 ease-in-out hover:shadow dark:bg-[radial-gradient(circle_at_50%_0%,hsl(var(--primary)/10%)_0%,transparent_60%)] dark:hover:shadow-[0_0_20px_hsl(var(--primary)/10%)]",
         className,
