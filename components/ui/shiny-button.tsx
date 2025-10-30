@@ -1,8 +1,9 @@
-// components/ui/shiny-button.tsx
+//components\ui\shiny-button.tsx
 "use client";
 
 import React from "react";
-import { motion, MotionProps, HTMLMotionProps } from "framer-motion";
+import { motion, type AnimationProps } from "framer-motion";
+
 import { cn } from "@/lib/utils";
 
 const animationProps: MotionProps = {
@@ -24,15 +25,8 @@ const animationProps: MotionProps = {
       mass: 0.5,
     },
   },
-};
-
-// Create a custom type that excludes conflicting drag props
-type ButtonPropsWithoutDrag = Omit<
-  React.ComponentPropsWithoutRef<"button">,
-  keyof HTMLMotionProps<"button"> | "onDrag" | "onDragStart" | "onDragEnd"
->;
-
-interface ShinyButtonProps extends ButtonPropsWithoutDrag {
+} as AnimationProps;
+interface ShinyButtonProps {
   children: React.ReactNode;
   className?: string;
 }
