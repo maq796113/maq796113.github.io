@@ -1,12 +1,11 @@
-//components\ui\shiny-button.tsx
+// components\ui\shiny-button.tsx
 "use client";
 
 import React from "react";
-import { motion, type AnimationProps } from "framer-motion";
-
+import { motion, MotionProps } from "framer-motion";
 import { cn } from "@/lib/utils";
 
-const animationProps = {
+const animationProps: MotionProps = {
   initial: { "--x": "100%", scale: 0.8 },
   animate: { "--x": "-100%", scale: 1 },
   whileTap: { scale: 0.95 },
@@ -25,16 +24,22 @@ const animationProps = {
       mass: 0.5,
     },
   },
-} as AnimationProps;
-interface ShinyButtonProps {
+};
+
+interface ShinyButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   children: React.ReactNode;
   className?: string;
 }
-const ShinyButton = ({ children, className, ...props }: ShinyButtonProps) => {
+
+const ShinyButton = ({ 
+  children, 
+  className,
+  ...buttonProps 
+}: ShinyButtonProps) => {
   return (
     <motion.button
       {...animationProps}
-      {...props}
+      {...buttonProps}
       className={cn(
         "relative rounded-lg px-6 py-2 font-medium backdrop-blur-xl transition-shadow duration-300 ease-in-out hover:shadow dark:bg-[radial-gradient(circle_at_50%_0%,hsl(var(--primary)/10%)_0%,transparent_60%)] dark:hover:shadow-[0_0_20px_hsl(var(--primary)/10%)]",
         className,
