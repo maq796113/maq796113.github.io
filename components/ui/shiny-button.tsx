@@ -1,8 +1,9 @@
-// components\ui\shiny-button.tsx
+//components\ui\shiny-button.tsx
 "use client";
 
 import React from "react";
-import { motion, MotionProps } from "framer-motion";
+import { motion, type AnimationProps } from "framer-motion";
+
 import { cn } from "@/lib/utils";
 
 const animationProps: MotionProps = {
@@ -24,9 +25,8 @@ const animationProps: MotionProps = {
       mass: 0.5,
     },
   },
-};
-
-interface ShinyButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+} as AnimationProps;
+interface ShinyButtonProps {
   children: React.ReactNode;
   className?: string;
 }
