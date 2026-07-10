@@ -23,7 +23,11 @@ export default defineConfig({
         // Specifies the directory TanStack Router uses for your routes.
         routesDirectory: 'app', // Defaults to "routes", relative to srcDirectory
         enableRouteGeneration: true
-      }
+      },
+      prerender: {
+        enabled: true,
+        crawlLinks: true,   // follows Link/`to` refs, catches /blog etc automatically
+      },
     })
   ],
 })
