@@ -1,7 +1,5 @@
-// app/page.tsx
-"use client";
-
-import Link from "next/link";
+// src/app/index.tsx
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { Home, PenSquare, Mail, Calendar } from "lucide-react";
 import { useMotionValue } from "framer-motion";
 import { cn } from "@/lib/utils";
@@ -13,8 +11,12 @@ import { ModeToggle } from "@/components/mode-toggle";
 import { AnimatedGridPattern } from "@/components/magicui/animated-grid-pattern";
 import React from "react";
 
+// Register this file as the root index "/" route
+export const Route = createFileRoute('/')({
+  component: HomePage,
+});
 
-type IconProps = React.ComponentProps<typeof Home>; // Get props type from any Lucide icon
+type IconProps = React.ComponentProps<typeof Home>;
 
 const Icons = {
   calendar: Calendar,
@@ -61,22 +63,23 @@ const Icons = {
   ),
 };
 
-// Static data configuration
+// Internal routes (utilizing TanStack type-safe links)
 const NAV_ITEMS = [
-  { href: "#", icon: Home, label: "Home" },
-  { href: "#", icon: PenSquare, label: "Blog" },
+  { to: "/", icon: Home, label: "Home" },
+  { to: "/blog", icon: PenSquare, label: "Blog" },
 ] as const;
 
-const SOCIAL_LINKS = {
-  GitHub: { url: "https://github.com/maq796113", icon: Icons.github },
-  LinkedIn: { url: "https://www.linkedin.com/in/abdullah-qureshi-9b760a17b", icon: Icons.linkedin },
-  X: { url: "#", icon: Icons.x },
-  Email: { url: "mailto:maq796113@gmail.com", icon: Icons.email },
-} as const;
+// External URLs (utilizing direct anchor tags)
+const SOCIAL_LINKS = [
+  { href: "https://github.com/maq796113", icon: Icons.github, label: "GitHub" },
+  { href: "https://www.linkedin.com/in/abdullah-qureshi-9b760a17b", icon: Icons.linkedin, label: "LinkedIn" },
+  { href: "#", icon: Icons.x, label: "X" },
+  { href: "mailto:maq796113@gmail.com", icon: Icons.email, label: "Email" },
+] as const;
 
 const buttonClass = buttonVariants({ variant: "ghost", size: "icon" });
 
-export default function HomePage() {
+function HomePage() {
   const mouseX = useMotionValue(Infinity);
 
   return (
@@ -87,19 +90,19 @@ export default function HomePage() {
         duration={3}
         repeatDelay={1}
         className={cn(
-          "[mask-image:radial-gradient(500px_circle_at_center,white,transparent)]",
+          "mask-[radial-gradient(500px_circle_at_center,white,transparent)]",
           "inset-x-0 inset-y-[-30%] h-[200%] skew-y-12",
         )}
       />
-      <span className="pointer-events-none whitespace-pre-wrap bg-gradient-to-b from-gray-900 to-gray-400 dark:from-white dark:to-slate-900/10 bg-clip-text text-center text-8xl font-semibold leading-none text-transparent">
+      <span className="pointer-events-none whitespace-pre-wrap bg-linear-to-b from-gray-900 to-gray-400 dark:from-white dark:to-slate-900/10 bg-clip-text text-center text-8xl font-semibold leading-none text-transparent">
         Abdullah Qureshi
       </span>
       
       <TooltipProvider>
         <Dock direction="middle" mouseX={mouseX}>
-          {NAV_ITEMS.map(({ href, icon: Icon, label }) => (
+          {NAV_ITEMS.map(({ to, icon: Icon, label }) => (
             <DockIcon key={label} mouseX={mouseX}>
-              <NavItem href={href} label={label}>
+              <NavItem to={to} label={label}>
                 <Icon className="size-4" />
               </NavItem>
             </DockIcon>
@@ -107,9 +110,9 @@ export default function HomePage() {
           
           <Separator orientation="vertical" className="h-full" />
           
-          {Object.entries(SOCIAL_LINKS).map(([name, { url, icon: Icon }]) => (
-            <DockIcon key={name} mouseX={mouseX}>
-              <NavItem href={url} label={name}>
+          {SOCIAL_LINKS.map(({ href, icon: Icon, label }) => (
+            <DockIcon key={label} mouseX={mouseX}>
+              <NavItem href={href} label={label}>
                 <Icon className="size-4" />
               </NavItem>
             </DockIcon>
@@ -135,24 +138,40 @@ export default function HomePage() {
   );
 }
 
+interface NavItemProps {
+  to?: string;
+  href?: string;
+  label: string;
+  children: React.ReactNode;
+}
+
 const NavItem = React.memo(({ 
+  to, 
   href, 
   label, 
   children 
-}: { 
-  href: string; 
-  label: string; 
-  children: React.ReactNode 
-}) => (
+}: NavItemProps) => (
   <Tooltip>
     <TooltipTrigger asChild>
-      <Link
-        href={href}
-        aria-label={label}
-        className={cn(buttonClass, "size-12 rounded-full")}
-      >
-        {children}
-      </Link>
+      {to ? (
+        <Link
+          to={to}
+          aria-label={label}
+          className={cn(buttonClass, "size-12 rounded-full")}
+        >
+          {children}
+        </Link>
+      ) : (
+        <a
+          href={href}
+          aria-label={label}
+          className={cn(buttonClass, "size-12 rounded-full")}
+          target={href?.startsWith("http") ? "_blank" : undefined}
+          rel={href?.startsWith("http") ? "noopener noreferrer" : undefined}
+        >
+          {children}
+        </a>
+      )}
     </TooltipTrigger>
     <TooltipContent>
       <p>{label}</p>
